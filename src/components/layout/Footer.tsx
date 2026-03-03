@@ -1,0 +1,101 @@
+import Link from "next/link";
+import { Phone, Mail, MapPin, ShieldCheck, CreditCard } from "lucide-react";
+
+export function Footer() {
+    return (
+        <footer className="bg-primary text-white pt-20 pb-8">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    {/* Brand */}
+                    <div className="space-y-6">
+                        <Link href="/" className="inline-block">
+                            <span className="text-2xl font-bold tracking-tight font-heading text-white">
+                                DESTINOS<span className="text-accent">EXPRESS</span>
+                            </span>
+                        </Link>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                            Transporte especial, ejecutivo y turístico con los más altos estándares de calidad, seguridad y confort en toda Colombia.
+                        </p>
+                        <div className="flex items-center gap-3">
+                            {/* Trust badges placeholders */}
+                            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center" title="Mintransporte">
+                                <ShieldCheck size={20} className="text-accent" />
+                            </div>
+                            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center" title="Supertransporte">
+                                <ShieldCheck size={20} className="text-accent" />
+                            </div>
+                            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center" title="SG-SST">
+                                <ShieldCheck size={20} className="text-accent" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Contact */}
+                    <div>
+                        <h4 className="text-lg font-semibold font-heading mb-6 border-b border-gray-800 pb-2 inline-block">Contáctanos</h4>
+                        <ul className="space-y-4">
+                            <li className="flex items-start gap-3">
+                                <Phone size={20} className="text-accent shrink-0 mt-0.5" />
+                                <div>
+                                    <a href="https://wa.me/573024060101" className="block text-gray-300 hover:text-white transition-colors">+57 302 406 0101</a>
+                                    <p className="text-sm text-gray-500">Línea WhatsApp 24/7</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Phone size={20} className="text-accent shrink-0 mt-0.5" />
+                                <div>
+                                    <a href="tel:6017437070" className="block text-gray-300 hover:text-white transition-colors">+57 601 743 7070</a>
+                                    <p className="text-sm text-gray-500">PBX Administrativo</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Mail size={20} className="text-accent shrink-0 mt-0.5" />
+                                <a href="mailto:info@destinosexpress.com" className="text-gray-300 hover:text-white transition-colors">info@destinosexpress.com</a>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <MapPin size={20} className="text-accent shrink-0 mt-0.5" />
+                                <span className="text-gray-300">Bogotá D.C. & Medellín<br />Colombia</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Links */}
+                    <div>
+                        <h4 className="text-lg font-semibold font-heading mb-6 border-b border-gray-800 pb-2 inline-block">Navegación</h4>
+                        <ul className="space-y-3">
+                            <li><Link href="/" className="text-gray-400 hover:text-accent transition-colors">Inicio</Link></li>
+                            <li><Link href="/servicios" className="text-gray-400 hover:text-accent transition-colors">Servicios</Link></li>
+                            <li><Link href="/flota" className="text-gray-400 hover:text-accent transition-colors">Flota</Link></li>
+                            <li><Link href="/trabaja-con-nosotros" className="text-gray-400 hover:text-accent transition-colors">Trabaja con Nosotros</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Trust */}
+                    <div>
+                        <h4 className="text-lg font-semibold font-heading mb-6 border-b border-gray-800 pb-2 inline-block">Pago Seguro</h4>
+                        <p className="text-gray-400 text-sm mb-4">Múltiples medios de pago a través de plataformas seguras y encriptadas.</p>
+                        <div className="flex gap-2 mb-6">
+                            <div className="bg-white/10 p-2 rounded"><CreditCard size={24} /></div>
+                            {/* Fake payment logos */}
+                            <div className="bg-white/10 px-3 py-2 rounded text-xs font-bold leading-none flex items-center">PSE</div>
+                            <div className="bg-white/10 px-3 py-2 rounded text-xs font-bold leading-none flex items-center">VISA</div>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-400 text-sm">
+                            <ShieldCheck size={16} className="text-green-500" />
+                            <span>Sitio Seguro SSL</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom */}
+                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+                    <p>© {new Date().getFullYear()} Destinos Express S.A.S. Todos los derechos reservados.</p>
+                    <div className="flex gap-4">
+                        <Link href="/politica-privacidad" className="hover:text-white transition-colors">Política de Privacidad</Link>
+                        <Link href="/terminos" className="hover:text-white transition-colors">Términos y Condiciones</Link>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+}
