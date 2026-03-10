@@ -7,12 +7,68 @@ import { CheckCircle, Upload, Briefcase, Car, ChevronRight, ArrowRight, Shield, 
 
 export default function TrabajaConNosotros() {
     const [activeTab, setActiveTab] = useState<"conductor" | "propietario">("conductor");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState<"conductor" | "propietario" | null>(null);
+
+    const submitConductor = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const fd = new FormData(form);
+        setIsSubmitting(true);
+        try {
+            await fetch("/api/aplicar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    tipo: "conductor",
+                    nombres: fd.get("nombres"),
+                    apellidos: fd.get("apellidos"),
+                    email: fd.get("email"),
+                    celular: fd.get("celular"),
+                    ciudad: fd.get("ciudad"),
+                    licencia: fd.get("licencia"),
+                }),
+            });
+            setIsSuccess("conductor");
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const submitPropietario = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const fd = new FormData(form);
+        setIsSubmitting(true);
+        try {
+            await fetch("/api/aplicar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    tipo: "propietario",
+                    nombre: fd.get("nombre"),
+                    celular: fd.get("celular"),
+                    marca_linea: fd.get("marca_linea"),
+                    modelo: fd.get("modelo"),
+                    capacidad: fd.get("capacidad"),
+                    tiene_conductor: fd.get("tiene_conductor"),
+                }),
+            });
+            setIsSuccess("propietario");
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const fadeUp = {
         hidden: { opacity: 0, y: 20 },
         show: (delay: number) => ({
             opacity: 1, y: 0,
-            transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
         }),
     };
 
@@ -247,25 +303,33 @@ export default function TrabajaConNosotros() {
 
                                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                     <h4 className="font-bold text-primary mb-4 border-b pb-2">Formulario de Aplicación - Conductor</h4>
-                                    <form className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input type="text" placeholder="Nombres Completos" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Apellidos" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="email" placeholder="Correo Electrónico" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="tel" placeholder="Número Celular" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Ciudad de Residencia" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Categoría de Licencia (Ej. C2)" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                    {isSuccess === "conductor" ? (
+                                        <div className="flex flex-col items-center justify-center py-10 text-center">
+                                            <CheckCircle size={48} className="text-accent mb-4" />
+                                            <p className="font-bold text-primary text-lg">¡Aplicación Enviada!</p>
+                                            <p className="text-gray-500 text-sm mt-2">Nos pondremos en contacto contigo pronto.</p>
                                         </div>
+                                    ) : (
+                                        <form className="space-y-4" onSubmit={submitConductor}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <input required name="nombres" type="text" placeholder="Nombres Completos" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="apellidos" type="text" placeholder="Apellidos" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="email" type="email" placeholder="Correo Electrónico" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="celular" type="tel" placeholder="Número Celular" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="ciudad" type="text" placeholder="Ciudad de Residencia" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="licencia" type="text" placeholder="Categoría de Licencia (Ej. C2)" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                            </div>
 
-                                        <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors">
-                                            <Upload size={24} className="mx-auto text-gray-400 mb-2" />
-                                            <p className="text-sm font-medium text-gray-600">Adjuntar Hoja de Vida (PDF, max 5MB)</p>
-                                        </div>
+                                            <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:bg-gray-100 cursor-pointer transition-colors">
+                                                <Upload size={24} className="mx-auto text-gray-400 mb-2" />
+                                                <p className="text-sm font-medium text-gray-600">Adjuntar Hoja de Vida (PDF, max 5MB)</p>
+                                            </div>
 
-                                        <button type="button" className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3 rounded-xl transition-all">
-                                            Enviar Aplicación
-                                        </button>
-                                    </form>
+                                            <button type="submit" disabled={isSubmitting} className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3 rounded-xl transition-all disabled:opacity-60">
+                                                {isSubmitting ? "Enviando..." : "Enviar Aplicación"}
+                                            </button>
+                                        </form>
+                                    )}
                                 </div>
                             </motion.div>
                         )}
@@ -288,24 +352,32 @@ export default function TrabajaConNosotros() {
 
                                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                     <h4 className="font-bold text-primary mb-4 border-b pb-2">Registro de Vehículo</h4>
-                                    <form className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <input type="text" placeholder="Nombre del Propietario" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="tel" placeholder="Número Celular" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Marca y Línea del Vehículo" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Modelo (Año)" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <input type="text" placeholder="Capacidad de Pasajeros" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
-                                            <select className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent text-gray-500">
-                                                <option value="">¿Cuenta con conductor?</option>
-                                                <option value="si">Sí, cuenta con conductor</option>
-                                                <option value="no">No, solo alquilo el vehículo</option>
-                                            </select>
+                                    {isSuccess === "propietario" ? (
+                                        <div className="flex flex-col items-center justify-center py-10 text-center">
+                                            <CheckCircle size={48} className="text-accent mb-4" />
+                                            <p className="font-bold text-primary text-lg">¡Solicitud Enviada!</p>
+                                            <p className="text-gray-500 text-sm mt-2">Revisaremos tu vehículo y te contactaremos pronto.</p>
                                         </div>
+                                    ) : (
+                                        <form className="space-y-4" onSubmit={submitPropietario}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <input required name="nombre" type="text" placeholder="Nombre del Propietario" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="celular" type="tel" placeholder="Número Celular" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="marca_linea" type="text" placeholder="Marca y Línea del Vehículo" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="modelo" type="text" placeholder="Modelo (Año)" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <input required name="capacidad" type="text" placeholder="Capacidad de Pasajeros" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent" />
+                                                <select required name="tiene_conductor" className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-accent text-gray-500">
+                                                    <option value="">¿Cuenta con conductor?</option>
+                                                    <option value="si">Sí, cuenta con conductor</option>
+                                                    <option value="no">No, solo alquilo el vehículo</option>
+                                                </select>
+                                            </div>
 
-                                        <button type="button" className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3 rounded-xl transition-all">
-                                            Solicitar Evaluación de Afiliación
-                                        </button>
-                                    </form>
+                                            <button type="submit" disabled={isSubmitting} className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3 rounded-xl transition-all disabled:opacity-60">
+                                                {isSubmitting ? "Enviando..." : "Solicitar Evaluación de Afiliación"}
+                                            </button>
+                                        </form>
+                                    )}
                                 </div>
                             </motion.div>
                         )}

@@ -19,7 +19,7 @@ const formSchema = z.object({
 
     pax: z.coerce.number().min(1, "Mínimo 1 pasajero"),
     maletas: z.coerce.number().min(0).optional(),
-    tipo_vehiculo: z.enum(["SUV", "Minivan", "Van", "Bus"]),
+    tipo_vehiculo: z.enum(["Kia Soluto", "Renault Duster", "Mini Van", "Van Trafic", "Van Sprinter", "Bus"]),
     observaciones: z.string().optional(),
 
     nombre: z.string().min(2, "Nombre requerido"),
@@ -42,7 +42,7 @@ function QuoteWizardForm() {
         resolver: zodResolver(formSchema) as any,
         defaultValues: {
             tipo_trayecto: "Sencillo",
-            tipo_vehiculo: "Minivan",
+            tipo_vehiculo: "Mini Van",
             pax: 1,
             maletas: 0,
         }
@@ -70,7 +70,7 @@ function QuoteWizardForm() {
         setIsSubmitting(true);
         try {
             // 1. Save to Supabase
-            const { error } = await supabase.from('leads').insert([{
+            const { error: dbError } = await supabase.from('leads').insert([{
                 nombre: data.nombre,
                 empresa: data.empresa,
                 email: data.email,
@@ -87,14 +87,18 @@ function QuoteWizardForm() {
                 origen_lead: 'Web Form'
             }]);
 
-            if (error) {
-                console.error("Error saving lead:", error);
-                // Fallback to whatsapp if error happens (for UX)
-            }
+            if (dbError) console.error("Error saving lead:", dbError);
+
+            // 2. Send email via Resend
+            await fetch("/api/cotizar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...data, servicio: selectedService }),
+            });
 
             setIsSuccess(true);
 
-            // Optional: open WhatsApp in new tab after showing success
+            // Open WhatsApp after showing success screen
             setTimeout(() => {
                 window.open(`https://wa.me/573024060101?text=${encodeURIComponent(formatWhatsAppMsg(data))}`, "_blank");
             }, 2000);
@@ -366,10 +370,12 @@ function QuoteWizardForm() {
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Vehículo Sugerido</label>
                                                         <select {...register("tipo_vehiculo")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
-                                                            <option value="SUV">SUV 4x4 (1-4 pax)</option>
-                                                            <option value="Minivan">Kia Sedona / Hyundai Staria (5-8 pax)</option>
-                                                            <option value="Van">Renault Master / MB Sprinter (9-16 pax)</option>
-                                                            <option value="Bus">Busetón / Bus (20+ pax)</option>
+                                                            <option value="Kia Soluto">Kia Soluto — Sedán (1-4 pax)</option>
+                                                            <option value="Renault Duster">Renault Duster — SUV 4x4 (1-4 pax)</option>
+                                                            <option value="Mini Van">Mini Van (5-7 pax)</option>
+                                                            <option value="Van Trafic">Van Trafic (9-12 pax)</option>
+                                                            <option value="Van Sprinter">Van Sprinter (13-19 pax)</option>
+                                                            <option value="Bus">Bus (20+ pax)</option>
                                                         </select>
                                                     </div>
 

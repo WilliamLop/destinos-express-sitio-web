@@ -47,15 +47,8 @@ export function Footer() {
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
-                                <Phone size={20} className="text-accent shrink-0 mt-0.5" />
-                                <div>
-                                    <a href="tel:6017437070" className="block text-gray-300 hover:text-white transition-colors">+57 601 743 7070</a>
-                                    <p className="text-sm text-gray-500">PBX Administrativo</p>
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-3">
                                 <Mail size={20} className="text-accent shrink-0 mt-0.5" />
-                                <a href="mailto:info@destinosexpress.com" className="text-gray-300 hover:text-white transition-colors">info@destinosexpress.com</a>
+                                <a href="mailto:comercial@destinosexpress.com" className="text-gray-300 hover:text-white transition-colors">comercial@destinosexpress.com</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin size={20} className="text-accent shrink-0 mt-0.5" />
