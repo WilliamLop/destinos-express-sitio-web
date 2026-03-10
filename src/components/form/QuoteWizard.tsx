@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Send, MapPin, Calendar, Clock, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Zap, Headphones, Star } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
 
 // Zod Schema
 const formSchema = z.object({
@@ -69,35 +68,12 @@ function QuoteWizardForm() {
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
         try {
-            // 1. Save to Supabase (non-blocking — never interrupts the flow)
-            supabase.from('leads').insert([{
-                nombre: data.nombre,
-                empresa: data.empresa,
-                email: data.email,
-                telefono: data.telefono,
-                origen: data.origen,
-                destino: data.destino,
-                fecha: data.fecha,
-                hora: data.hora,
-                pax: data.pax,
-                maletas: data.maletas,
-                tipo_vehiculo: data.tipo_vehiculo,
-                tipo_trayecto: data.tipo_trayecto,
-                observaciones: selectedService ? `[Servicio: ${selectedService}] ${data.observaciones || ''}` : data.observaciones,
-                origen_lead: 'Web Form'
-            }]).then(({ error }) => {
-                if (error) console.warn("Supabase:", error.message);
-            }).catch(() => {});
-
-            // 2. Send email via Resend (primary flow)
             await fetch("/api/cotizar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...data, servicio: selectedService }),
             });
-
             setIsSuccess(true);
-
         } catch (e) {
             console.error(e);
         } finally {
