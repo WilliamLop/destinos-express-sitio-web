@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description: "Transporte especial, ejecutivo y turístico en Colombia. Traslados de aeropuerto 24/7, servicio empresarial, turístico y para adulto mayor. Cobertura en 16 ciudades.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Destinos Express — Transporte Especial Colombia",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Destinos Express — Transporte Especial y Ejecutivo",
     description: "Transporte especial, ejecutivo y turístico en Colombia. 16 ciudades. 24/7.",
-    images: ["/og-image.jpg"],
+    images: ["/opengraph-image"],
   },
   alternates: {
     canonical: "https://destinosexpress.com",

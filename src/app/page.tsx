@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     url: "https://destinosexpress.com",
     title: "Destinos Express — Transporte Especial y Ejecutivo en Colombia",
     description: "Transporte especial, ejecutivo y turístico en Colombia. Traslados de aeropuerto 24/7, servicio empresarial y turístico. +500 empresas. 16 ciudades.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
 };
 
