@@ -69,8 +69,8 @@ function QuoteWizardForm() {
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
         try {
-            // 1. Save to Supabase
-            const { error: dbError } = await supabase.from('leads').insert([{
+            // 1. Save to Supabase (non-blocking — never interrupts the flow)
+            supabase.from('leads').insert([{
                 nombre: data.nombre,
                 empresa: data.empresa,
                 email: data.email,
@@ -85,11 +85,11 @@ function QuoteWizardForm() {
                 tipo_trayecto: data.tipo_trayecto,
                 observaciones: selectedService ? `[Servicio: ${selectedService}] ${data.observaciones || ''}` : data.observaciones,
                 origen_lead: 'Web Form'
-            }]);
+            }]).then(({ error }) => {
+                if (error) console.warn("Supabase:", error.message);
+            }).catch(() => {});
 
-            if (dbError) console.error("Error saving lead:", dbError);
-
-            // 2. Send email via Resend
+            // 2. Send email via Resend (primary flow)
             await fetch("/api/cotizar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -97,11 +97,6 @@ function QuoteWizardForm() {
             });
 
             setIsSuccess(true);
-
-            // Open WhatsApp after showing success screen
-            setTimeout(() => {
-                window.open(`https://wa.me/573024060101?text=${encodeURIComponent(formatWhatsAppMsg(data))}`, "_blank");
-            }, 2000);
 
         } catch (e) {
             console.error(e);
