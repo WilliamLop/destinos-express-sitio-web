@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Phone, Mail, MapPin, ShieldCheck, CreditCard } from "lucide-react";
 
 export function Footer() {
@@ -9,9 +10,13 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-6">
                         <Link href="/" className="inline-block">
-                            <span className="text-2xl font-bold tracking-tight font-heading text-white">
-                                DESTINOS<span className="text-accent">EXPRESS</span>
-                            </span>
+                            <Image
+                                src="/icons/logowhite.png"
+                                alt="Destinos Express"
+                                width={140}
+                                height={44}
+                                className="object-contain w-[110px] h-auto"
+                            />
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Transporte especial, ejecutivo y turístico con los más altos estándares de calidad, seguridad y confort en toda Colombia.

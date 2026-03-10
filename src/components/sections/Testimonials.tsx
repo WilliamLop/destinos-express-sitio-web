@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import "./testimonials.css";
 
 const testimonialsData = [
     {
@@ -84,49 +85,38 @@ const TestimonialsColumn = (props: {
     testimonials: typeof testimonialsData;
     duration?: number;
 }) => {
+    const cards = props.testimonials.map(({ text, image, name, role, company }, i) => (
+        <div
+            className="p-8 rounded-3xl border border-gray-100 bg-white hover:border-primary/20 hover:shadow-primary/5 shadow-sm transition-all duration-300 w-full flex flex-col gap-5 relative overflow-hidden group"
+            key={i}
+        >
+            <div className="absolute top-0 left-0 w-1 h-full bg-accent/0 group-hover:bg-accent transition-colors duration-300 rounded-l-3xl"></div>
+            <div className="text-gray-700 leading-relaxed italic z-10 relative">"{text}"</div>
+            <div className="flex items-center gap-4 mt-2">
+                <img
+                    width={48}
+                    height={48}
+                    src={image}
+                    alt={name}
+                    className="h-12 w-12 rounded-full border border-gray-100 bg-gray-50 flex-shrink-0"
+                />
+                <div className="flex flex-col">
+                    <div className="font-bold tracking-tight text-primary leading-tight">{name}</div>
+                    <div className="text-sm tracking-tight text-gray-500">{role} - {company}</div>
+                </div>
+            </div>
+        </div>
+    ));
+
     return (
-        <div className={props.className}>
-            <motion.div
-                animate={{
-                    translateY: "-50%",
-                }}
-                transition={{
-                    duration: props.duration || 10,
-                    repeat: Infinity,
-                    ease: "linear",
-                    repeatType: "loop",
-                }}
-                className="flex flex-col gap-6 pb-6 bg-transparent"
+        <div className={`overflow-hidden ${props.className ?? ""}`}>
+            <div
+                className="testimonials-scroll flex flex-col gap-6"
+                style={{ animationDuration: `${props.duration ?? 20}s` }}
             >
-                {[
-                    ...new Array(2).fill(0).map((_, index) => (
-                        <React.Fragment key={index}>
-                            {props.testimonials.map(({ text, image, name, role, company }, i) => (
-                                <div
-                                    className="p-8 rounded-3xl border border-gray-100 bg-white hover:border-primary/20 hover:shadow-primary/5 shadow-sm transition-all duration-300 w-full flex flex-col gap-5 relative overflow-hidden group"
-                                    key={i}
-                                >
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-accent/0 group-hover:bg-accent transition-colors duration-300 rounded-l-3xl"></div>
-                                    <div className="text-gray-700 leading-relaxed italic z-10 relative">"{text}"</div>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <img
-                                            width={48}
-                                            height={48}
-                                            src={image}
-                                            alt={name}
-                                            className="h-12 w-12 rounded-full border border-gray-100 bg-gray-50 flex-shrink-0"
-                                        />
-                                        <div className="flex flex-col">
-                                            <div className="font-bold tracking-tight text-primary leading-tight">{name}</div>
-                                            <div className="text-sm tracking-tight text-gray-500">{role} - {company}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </React.Fragment>
-                    )),
-                ]}
-            </motion.div>
+                <div className="flex flex-col gap-6 pb-6">{cards}</div>
+                <div className="flex flex-col gap-6 pb-6" aria-hidden>{cards}</div>
+            </div>
         </div>
     );
 };
@@ -183,20 +173,6 @@ export function Testimonials() {
                     />
                 </div>
 
-                {/* B2B Logos Placeholder */}
-                <div className="border-t border-gray-200/60 pt-16">
-                    <p className="text-center text-sm text-gray-400 font-semibold tracking-wider uppercase mb-8">
-                        Empresas que confían en nosotros
-                    </p>
-                    <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                        {/* These would ideally be real SVG logos of partner companies */}
-                        <div className="text-xl font-bold text-gray-800 font-heading">COMPANY LOGO</div>
-                        <div className="text-xl font-bold text-gray-800 font-heading">CORPORATION</div>
-                        <div className="text-xl font-bold text-gray-800 font-heading">ENTERPRISE LTDA</div>
-                        <div className="text-xl font-bold text-gray-800 font-heading">GRUPO INVERSOR</div>
-                        <div className="text-xl font-bold text-gray-800 font-heading">BRAND INC</div>
-                    </div>
-                </div>
             </div>
         </section>
     );

@@ -14,7 +14,7 @@ export function FAQ() {
         },
         {
             question: "¿Con cuánto tiempo de anticipación debo reservar?",
-            answer: "Recomendamos realizar la reserva con un mínimo de 24 horas de antelación para garantizar disponibilidad y selección del vehículo idóneo. Sin embargo, para emergencias o aeropuerto sujetos a disponibilidad, aceptamos traslados con 3 horas de aviso.",
+            answer: "Recomendamos realizar la reserva con un mínimo de 24 horas de antelación para garantizar disponibilidad y selección del vehículo idóneo. Sin embargo, para emergencias o traslados de aeropuerto sujetos a disponibilidad, aceptamos reservas con 3 horas de aviso.",
         },
         {
             question: "¿Los vehículos cuentan con seguros y permisos vigentes?",
@@ -27,6 +27,26 @@ export function FAQ() {
         {
             question: "¿Ofrecen servicios de van y buses intermunicipales o para turismo?",
             answer: "Sí, a través de nuestra división turística podemos cubrir rutas a nivel nacional y sitios de interés turístico, acompañados si se requiere de guías bilingües y paramédicos para grupos especiales o de tercera edad.",
+        },
+        {
+            question: "¿Cómo funciona el servicio de trazabilidad y monitoreo en tiempo real?",
+            answer: "Todos nuestros vehículos cuentan con GPS activo conectado a nuestra central de operaciones. Para servicios Senior/Especial y contratos corporativos, compartimos un enlace de seguimiento en tiempo real con el responsable del traslado, permitiendo rastrear la ubicación del vehículo durante todo el trayecto.",
+        },
+        {
+            question: "¿Puedo solicitar un conductor bilingüe para clientes internacionales?",
+            answer: "Sí, contamos con conductores con nivel de inglés conversacional certificado para la atención de delegaciones empresariales, turistas internacionales y ejecutivos extranjeros. Este servicio debe solicitarse con mínimo 48 horas de anticipación para asegurar disponibilidad.",
+        },
+        {
+            question: "¿Cómo se maneja la logística para eventos con múltiples vehículos?",
+            answer: "Para eventos que requieren coordinación de flota (congresos, bodas, ferias), asignamos un coordinador operativo exclusivo que gestiona horarios, puntos de recogida, rutas y comunicación en tiempo real con todos los conductores. Ofrecemos reuniones previas de briefing sin costo para eventos de más de 5 vehículos.",
+        },
+        {
+            question: "¿Qué certificaciones y habilitaciones tiene Destinos Express?",
+            answer: "Estamos habilitados por el Ministerio de Transporte (MinTransporte) y vigilados por la Superintendencia de Transporte (SuperTransporte). Contamos con Sistema de Gestión de Seguridad y Salud en el Trabajo (SG-SST) implementado, pólizas de seguros al pasajero vigentes y cumplimos con toda la normativa del Decreto 0348 de 2015.",
+        },
+        {
+            question: "¿Cuál es la cobertura geográfica del servicio?",
+            answer: "Operamos en las principales ciudades de Colombia: Bogotá, Medellín, Cali, Barranquilla, Cartagena, Bucaramanga, Pereira, Manizales, Armenia, Ibagué, Cúcuta, Villavicencio, Santa Marta, Montería, Pasto y Valledupar. Adicionalmente cubrimos rutas rurales e intermunicipales bajo evaluación previa de condiciones de seguridad vial.",
         },
     ];
 

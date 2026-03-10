@@ -41,8 +41,8 @@ export function VehicleCard({ vehicle, index }: VehicleCardProps) {
                 <div className="w-full lg:w-1/2 flex flex-col gap-4">
                     {/* Main Image */}
                     <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gray-100 mb-2">
-                        <div className="absolute top-4 left-4 z-10 bg-primary text-accent text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                            Modelo {vehicle.year}
+                        <div className="absolute top-4 left-4 z-10 bg-primary/80 backdrop-blur-sm text-white/70 text-xs font-medium px-3 py-1.5 rounded-full tracking-wide">
+                            Imágenes de referencia
                         </div>
                         <AnimatePresence mode="wait">
                             <motion.div

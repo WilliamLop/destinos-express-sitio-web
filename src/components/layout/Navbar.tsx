@@ -2,11 +2,23 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, Phone } from "lucide-react";
 
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+
+    const navLinks = [
+        { href: "/", label: "Inicio" },
+        { href: "/servicios", label: "Servicios" },
+        { href: "/flota", label: "Flota" },
+        { href: "/trabaja-con-nosotros", label: "Trabaja con Nosotros" },
+    ];
+
+    const isActive = (href: string) =>
+        href === "/" ? pathname === "/" : pathname.startsWith(href);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -33,18 +45,19 @@ export function Navbar() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/" className={`text-sm font-medium transition-colors hover:text-accent text-gray-700`}>
-                        Inicio
-                    </Link>
-                    <Link href="/servicios" className={`text-sm font-medium transition-colors hover:text-accent text-gray-700`}>
-                        Servicios
-                    </Link>
-                    <Link href="/flota" className={`text-sm font-medium transition-colors hover:text-accent text-gray-700`}>
-                        Flota
-                    </Link>
-                    <Link href="/trabaja-con-nosotros" className={`text-sm font-medium transition-colors hover:text-accent text-gray-700`}>
-                        Trabaja con Nosotros
-                    </Link>
+                    {navLinks.map(({ href, label }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={`text-sm font-medium transition-colors hover:text-accent ${
+                                isActive(href)
+                                    ? "text-accent font-semibold border-b-2 border-accent pb-0.5"
+                                    : "text-gray-700"
+                            }`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
                 </nav>
 
                 {/* CTA & Contact*/}
@@ -78,18 +91,18 @@ export function Navbar() {
             {/* Mobile Nav */}
             {isMobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col py-4 px-6 gap-4">
-                    <Link href="/" className="text-lg font-medium text-gray-800" onClick={() => setIsMobileMenuOpen(false)}>
-                        Inicio
-                    </Link>
-                    <Link href="/servicios" className="text-lg font-medium text-gray-800" onClick={() => setIsMobileMenuOpen(false)}>
-                        Servicios
-                    </Link>
-                    <Link href="/flota" className="text-lg font-medium text-gray-800" onClick={() => setIsMobileMenuOpen(false)}>
-                        Flota
-                    </Link>
-                    <Link href="/trabaja-con-nosotros" className="text-lg font-medium text-gray-800" onClick={() => setIsMobileMenuOpen(false)}>
-                        Trabaja con Nosotros
-                    </Link>
+                    {navLinks.map(({ href, label }) => (
+                        <Link
+                            key={href}
+                            href={href}
+                            className={`text-lg font-medium ${
+                                isActive(href) ? "text-accent font-semibold" : "text-gray-800"
+                            }`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {label}
+                        </Link>
+                    ))}
                     <div className="h-px w-full bg-gray-100 my-2" />
                     <Link
                         href="/#cotizar"

@@ -2,30 +2,204 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, Upload, Briefcase, Car } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle, Upload, Briefcase, Car, ChevronRight, ArrowRight, Shield, MapPin, Clock, TrendingUp } from "lucide-react";
 
 export default function TrabajaConNosotros() {
     const [activeTab, setActiveTab] = useState<"conductor" | "propietario">("conductor");
 
-    return (
-        <div className="min-h-screen bg-gray-50 pt-10 pb-24">
-            {/* Header */}
-            <div className="container mx-auto px-4 md:px-6 mb-12">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-3xl mx-auto text-center"
-                >
-                    <h1 className="text-4xl md:text-5xl font-bold font-heading text-primary mb-6">
-                        Únete a nuestro gran <span className="text-accent">Equipo Operativo</span>
-                    </h1>
-                    <p className="text-lg text-gray-600">
-                        En Destinos Express buscamos personal altamente calificado y vehículos en excelentes condiciones para seguir brindando el mejor servicio de Colombia.
-                    </p>
-                </motion.div>
-            </div>
+    const fadeUp = {
+        hidden: { opacity: 0, y: 20 },
+        show: (delay: number) => ({
+            opacity: 1, y: 0,
+            transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] },
+        }),
+    };
 
-            <div className="container mx-auto px-4 md:px-6">
+    const stats = [
+        { value: "16+",  label: "Ciudades" },
+        { value: "10+",  label: "Años de experiencia" },
+        { value: "500+", label: "Empresas atendidas" },
+        { value: "24/7", label: "Operación" },
+    ];
+
+    const perks = [
+        { icon: TrendingUp, label: "Ingresos estables" },
+        { icon: MapPin,     label: "Rutas garantizadas" },
+        { icon: Shield,     label: "Respaldo operativo" },
+        { icon: Clock,      label: "Horarios flexibles" },
+    ];
+
+    return (
+        <div className="min-h-screen bg-gray-50 pb-24">
+
+            {/* ── HERO ── */}
+            <section className="relative overflow-hidden bg-[#0D0D0D] pt-20">
+
+                {/* Background image */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2669&auto=format&fit=crop"
+                        alt="" aria-hidden
+                        className="w-full h-full object-cover opacity-40"
+                        style={{ filter: "saturate(0.6)" }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/85 to-[#0D0D0D]/30" />
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            background: "radial-gradient(ellipse 50% 65% at 70% 50%, rgba(252,163,17,0.07) 0%, transparent 70%)",
+                        }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent" />
+                </div>
+
+                {/* Vertical golden rule */}
+                <div className="absolute left-0 top-1/2 w-1 h-32 bg-gradient-to-b from-transparent via-[#FCA311] to-transparent -translate-y-1/2 pointer-events-none z-0" />
+
+                {/* ── CONTENIDO ── */}
+                <div className="relative z-10 container mx-auto px-4 md:px-8 pt-6 pb-14">
+
+                    {/* Breadcrumb + eyebrow */}
+                    <motion.div
+                        custom={0} variants={fadeUp} initial="hidden" animate="show"
+                        className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5"
+                    >
+                        <nav className="flex items-center gap-1.5 text-white/40 text-xs font-medium" aria-label="breadcrumb">
+                            <Link href="/" className="hover:text-white/70 transition-colors">Inicio</Link>
+                            <ChevronRight size={12} className="flex-shrink-0" />
+                            <span className="text-[#FCA311]">Trabaja con Nosotros</span>
+                        </nav>
+                        <span className="inline-flex items-center gap-1.5 bg-[#FCA311]/10 border border-[#FCA311]/25 text-[#FCA311] text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full">
+                            <span className="w-1 h-1 rounded-full bg-[#FCA311] animate-pulse" />
+                            Únete al equipo
+                        </span>
+                    </motion.div>
+
+                    <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start lg:items-center">
+
+                        {/* Columna izquierda */}
+                        <div className="flex-1 max-w-xl">
+                            <motion.h1
+                                custom={0.15} variants={fadeUp} initial="hidden" animate="show"
+                                className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-white tracking-tight leading-[1.05] mb-4"
+                            >
+                                Trabaja con{" "}
+                                <span className="relative inline-block">
+                                    <span className="text-[#FCA311]">Nosotros</span>
+                                    <svg
+                                        className="absolute -bottom-1.5 left-0 w-full"
+                                        viewBox="0 0 200 8" fill="none"
+                                        preserveAspectRatio="none" aria-hidden
+                                    >
+                                        <motion.path
+                                            d="M2 6 Q50 2 100 5 Q150 8 198 3"
+                                            stroke="#FCA311" strokeWidth="2.5" strokeLinecap="round"
+                                            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                                            transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
+                                        />
+                                    </svg>
+                                </span>
+                            </motion.h1>
+
+                            <motion.p
+                                custom={0.25} variants={fadeUp} initial="hidden" animate="show"
+                                className="text-white/60 text-base leading-relaxed mb-6"
+                            >
+                                Buscamos conductores comprometidos y propietarios con vehículos de calidad para seguir siendo el mejor servicio de transporte especial de Colombia.
+                            </motion.p>
+
+                            {/* Perks pills */}
+                            <motion.div
+                                custom={0.32} variants={fadeUp} initial="hidden" animate="show"
+                                className="flex flex-wrap gap-2"
+                            >
+                                {perks.map((p) => (
+                                    <span
+                                        key={p.label}
+                                        className="inline-flex items-center gap-1.5 bg-white/6 border border-white/10 text-white/65 text-xs font-medium px-3 py-1.5 rounded-full"
+                                    >
+                                        <p.icon size={12} className="text-[#FCA311]" />
+                                        {p.label}
+                                    </span>
+                                ))}
+                            </motion.div>
+                        </div>
+
+                        {/* Columna derecha — selector de ruta */}
+                        <div className="lg:w-[420px] flex-shrink-0">
+                            <motion.p
+                                custom={0.2} variants={fadeUp} initial="hidden" animate="show"
+                                className="text-white/70 text-xs font-semibold tracking-widest uppercase mb-3"
+                            >
+                                ¿Cómo quieres unirte?
+                            </motion.p>
+                            <motion.div
+                                custom={0.3} variants={fadeUp} initial="hidden" animate="show"
+                                className="flex flex-col gap-3"
+                            >
+                                {/* Card Conductor */}
+                                <a
+                                    href="#formulario"
+                                    onClick={() => setActiveTab("conductor")}
+                                    className="group flex items-center justify-between bg-white/5 hover:bg-[#FCA311]/10 border border-white/8 hover:border-[#FCA311]/40 rounded-2xl px-5 py-4 transition-all duration-200"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-[#FCA311]/10 group-hover:bg-[#FCA311]/20 flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <Briefcase size={18} className="text-[#FCA311]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-bold text-sm leading-tight">Soy Conductor</p>
+                                            <p className="text-white/40 text-xs mt-0.5">Aplica con tu licencia C1/C2</p>
+                                        </div>
+                                    </div>
+                                    <ArrowRight size={16} className="text-white/25 group-hover:text-[#FCA311] group-hover:translate-x-1 transition-all" />
+                                </a>
+
+                                {/* Card Propietario */}
+                                <a
+                                    href="#formulario"
+                                    onClick={() => setActiveTab("propietario")}
+                                    className="group flex items-center justify-between bg-white/5 hover:bg-[#FCA311]/10 border border-white/8 hover:border-[#FCA311]/40 rounded-2xl px-5 py-4 transition-all duration-200"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-[#FCA311]/10 group-hover:bg-[#FCA311]/20 flex items-center justify-center flex-shrink-0 transition-colors">
+                                            <Car size={18} className="text-[#FCA311]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-bold text-sm leading-tight">Soy Propietario de Vehículo</p>
+                                            <p className="text-white/40 text-xs mt-0.5">Afilia tu vehículo modelo 2020+</p>
+                                        </div>
+                                    </div>
+                                    <ArrowRight size={16} className="text-white/25 group-hover:text-[#FCA311] group-hover:translate-x-1 transition-all" />
+                                </a>
+                            </motion.div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── STATS STRIP ── */}
+                <motion.div
+                    custom={0.4} variants={fadeUp} initial="hidden" animate="show"
+                    className="relative z-10 border-t border-white/8"
+                >
+                    <div className="container mx-auto px-4 md:px-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4">
+                            {stats.map((s) => (
+                                <div
+                                    key={s.label}
+                                    className="py-4 px-4 flex items-center gap-3 border-r border-white/8 last:border-r-0"
+                                >
+                                    <span className="text-2xl font-bold font-heading text-[#FCA311] tracking-tight">{s.value}</span>
+                                    <span className="text-white/40 text-xs font-medium uppercase tracking-wider leading-tight">{s.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            </section>
+
+            <div id="formulario" className="container mx-auto px-4 md:px-6 mt-12">
                 <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
 
                     {/* Tabs */}

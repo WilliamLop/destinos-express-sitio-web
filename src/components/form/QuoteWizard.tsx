@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Send, MapPin, Calendar, Clock, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Send, MapPin, Calendar, Clock, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Zap, Headphones, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 // Zod Schema
@@ -115,23 +115,92 @@ function QuoteWizardForm() {
         }
     };
 
+    const trustItems = [
+        { icon: <Zap size={16} />, text: "Respuesta en menos de 1 hora" },
+        { icon: <ShieldCheck size={16} />, text: "Datos protegidos con SSL" },
+        { icon: <Headphones size={16} />, text: "Asesor dedicado para tu solicitud" },
+        { icon: <Star size={16} />, text: "99% de satisfacción de clientes" },
+    ];
+
     return (
-        <section id="cotizar" className="py-24 bg-gray-50 relative">
-            {/* Abstract Background Elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <section id="cotizar" className="relative bg-primary py-24 overflow-hidden">
+
+            {/* ── Background photo layer ── */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2670&auto=format&fit=crop"
+                    alt=""
+                    aria-hidden
+                    className="w-full h-full object-cover opacity-20"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/85 to-primary" />
+            </div>
+
+            {/* ── Gold dot grid ── */}
+            <div
+                className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none"
+                style={{
+                    backgroundImage: "radial-gradient(#FCA311 1px, transparent 1px)",
+                    backgroundSize: "30px 30px",
+                }}
+            />
+
+            {/* ── Ambient glow accents ── */}
+            <div className="absolute -top-32 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] pointer-events-none z-0" />
+            <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-accent/5 rounded-full blur-[80px] pointer-events-none z-0" />
+
+            {/* ── Diagonal accent line ── */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent z-0" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="text-center max-w-2xl mx-auto mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold font-heading text-primary mb-4">
-                        Solicita tu<span className="text-accent"> Cotización</span>
-                    </h2>
-                    <p className="text-gray-700/70 text-lg">
-                        Completa los detalles de tu viaje a continuación. Nuestro equipo te brindará la mejor tarifa y las opciones de transporte más adecuadas para tus necesidades.
-                    </p>
-                </div>
 
-                <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-1">
+                {/* ── Dramatic header ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center max-w-3xl mx-auto mb-10"
+                >
+                    <span className="inline-flex items-center gap-2 bg-accent/15 border border-accent/30 text-accent text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                        Cotización Gratuita — Sin Compromiso
+                    </span>
+                    <h2 className="text-4xl md:text-6xl font-bold font-heading text-white leading-tight mb-5">
+                        Tu próximo viaje,<br />
+                        <span className="text-accent">cotizado en 2 minutos</span>
+                    </h2>
+                    <p className="text-white/55 text-lg leading-relaxed max-w-xl mx-auto">
+                        Completa los detalles de tu ruta y recibe una propuesta personalizada con el vehículo y la tarifa exacta para tus necesidades.
+                    </p>
+                </motion.div>
+
+                {/* ── Trust signals row ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="flex flex-wrap justify-center gap-3 mb-12"
+                >
+                    {trustItems.map((item, i) => (
+                        <div
+                            key={i}
+                            className="inline-flex items-center gap-2 bg-white/8 border border-white/12 backdrop-blur-sm text-white/75 text-sm font-medium px-4 py-2 rounded-full"
+                        >
+                            <span className="text-accent">{item.icon}</span>
+                            {item.text}
+                        </div>
+                    ))}
+                </motion.div>
+
+                {/* ── Form card — identical internals, elevated shadow ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.15 }}
+                    className="max-w-4xl mx-auto bg-white rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.45)] overflow-hidden ring-1 ring-white/10 p-1"
+                >
 
                     <div className="grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
                         {/* Sidebar / Progress */}
@@ -392,7 +461,7 @@ function QuoteWizardForm() {
                         </div>
 
                     </div>
-                </div>
+                </motion.div>
             </div>
         </section>
     );
@@ -401,8 +470,8 @@ function QuoteWizardForm() {
 export function QuoteWizard() {
     return (
         <Suspense fallback={
-            <div className="py-24 bg-gray-50 flex justify-center min-h-[600px] items-center">
-                <p className="text-gray-500 font-medium">Cargando cotizador...</p>
+            <div className="py-24 bg-primary flex justify-center min-h-[600px] items-center">
+                <p className="text-white/50 font-medium">Cargando cotizador...</p>
             </div>
         }>
             <QuoteWizardForm />

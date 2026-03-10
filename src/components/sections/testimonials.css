@@ -1,0 +1,13 @@
+@keyframes testimonials-scroll {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-50%); }
+}
+
+.testimonials-scroll {
+    animation: testimonials-scroll linear infinite;
+    will-change: transform;
+}
+
+.testimonials-scroll:hover {
+    animation-play-state: paused;
+}
