@@ -98,7 +98,7 @@ function QuoteWizardForm() {
     ];
 
     return (
-        <section id="cotizar" className="relative bg-primary py-24 overflow-hidden">
+        <section className="relative bg-primary py-24 overflow-hidden">
 
             {/* ── Background photo layer ── */}
             <div className="absolute inset-0 z-0">
@@ -453,12 +453,14 @@ function QuoteWizardForm() {
 
 export function QuoteWizard() {
     return (
-        <Suspense fallback={
-            <div className="py-24 bg-primary flex justify-center min-h-[600px] items-center">
-                <p className="text-white/50 font-medium">Cargando cotizador...</p>
-            </div>
-        }>
-            <QuoteWizardForm />
-        </Suspense>
+        <div id="cotizar" className="scroll-mt-20">
+            <Suspense fallback={
+                <div className="py-24 bg-primary flex justify-center min-h-[600px] items-center">
+                    <p className="text-white/50 font-medium">Cargando cotizador...</p>
+                </div>
+            }>
+                <QuoteWizardForm />
+            </Suspense>
+        </div>
     );
 }
