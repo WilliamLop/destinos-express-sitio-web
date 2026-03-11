@@ -274,7 +274,7 @@ export function Services() {
                                 </ul>
 
                                 {/* CTA */}
-                                <Link
+                                <a
                                     href={`/?servicio=${encodeURIComponent(service.title)}#cotizar`}
                                     className={`inline-flex items-center gap-2 font-bold text-sm group/cta transition-all ${
                                         service.dark
@@ -286,7 +286,7 @@ export function Services() {
                                 >
                                     {service.cta}
                                     <ArrowRight className="w-4 h-4 group-hover/cta:translate-x-1 transition-transform" />
-                                </Link>
+                                </a>
                             </div>
                         </motion.div>
                     ))}
@@ -307,13 +307,13 @@ export function Services() {
                             Nuestro equipo diseña soluciones personalizadas para contratos corporativos de largo plazo.
                         </p>
                     </div>
-                    <Link
+                    <a
                         href="/#cotizar"
                         className="shrink-0 bg-accent hover:bg-accent-hover text-primary font-bold px-7 py-3.5 rounded-full transition-all shadow-lg hover:shadow-accent/30 flex items-center gap-2"
                     >
                         Solicitar Cotización
                         <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </a>
                 </motion.div>
             </div>
         </section>
