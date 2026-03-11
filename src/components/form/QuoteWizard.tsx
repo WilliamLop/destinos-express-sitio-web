@@ -37,7 +37,7 @@ function QuoteWizardForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const { register, handleSubmit, formState: { errors }, trigger, watch } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, trigger, watch, reset } = useForm<FormData>({
         resolver: zodResolver(formSchema) as any,
         defaultValues: {
             tipo_trayecto: "Sencillo",
@@ -241,7 +241,14 @@ function QuoteWizardForm() {
                                     <p className="text-gray-600 mb-8 max-w-sm">
                                         Hemos registrado tu solicitud correctamente. En breve te redirigiremos a WhatsApp para seguimiento inmediato, o uno de nuestros asesores te contactará al correo proporcionado.
                                     </p>
-                                    <button onClick={() => window.location.reload()} className="text-accent font-semibold hover:underline">
+                                    <button
+                                        onClick={() => {
+                                            setIsSuccess(false);
+                                            setStep(1);
+                                            reset();
+                                        }}
+                                        className="text-accent font-semibold hover:underline"
+                                    >
                                         Realizar nueva cotización
                                     </button>
                                 </motion.div>
