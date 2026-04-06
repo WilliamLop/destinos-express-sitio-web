@@ -144,7 +144,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"

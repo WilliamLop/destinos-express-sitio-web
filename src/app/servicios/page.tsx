@@ -6,8 +6,11 @@ import {
     ChevronRight, Building2, Plane, MapPin,
     Star, Crown, Heart, ArrowRight
 } from "lucide-react";
-import { Services } from "@/components/sections/Services";
-import { FAQ } from "@/components/sections/FAQ";
+import dynamic from "next/dynamic";
+
+const Services    = dynamic(() => import("@/components/sections/Services").then(m => ({ default: m.Services })));
+const QuoteWizard = dynamic(() => import("@/components/form/QuoteWizard").then(m => ({ default: m.QuoteWizard })));
+const FAQ         = dynamic(() => import("@/components/sections/FAQ").then(m => ({ default: m.FAQ })));
 
 const services = [
     { icon: Building2, label: "Empresarial" },
@@ -124,8 +127,7 @@ export default function ServiciosPage() {
                                 className="flex items-center gap-3 flex-wrap"
                             >
                                 <a
-                                    href="https://wa.me/573024060101?text=Hola%2C%20quiero%20cotizar%20un%20servicio%20de%20transporte"
-                                    target="_blank" rel="noopener noreferrer"
+                                    href="#cotizar"
                                     className="group inline-flex items-center gap-2.5 bg-[#FCA311] hover:bg-[#e8940a] text-[#0D0D0D] font-bold text-sm px-6 py-3 rounded-xl transition-all duration-200 shadow-lg shadow-[#FCA311]/20 hover:shadow-[#FCA311]/35 hover:scale-[1.02]"
                                 >
                                     Cotizar ahora
@@ -192,6 +194,7 @@ export default function ServiciosPage() {
             <div id="servicios">
                 <Services />
             </div>
+            <QuoteWizard />
             <FAQ />
         </main>
     );

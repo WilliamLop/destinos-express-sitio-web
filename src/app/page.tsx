@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Hero } from "@/components/sections/Hero";
 import { Features } from "@/components/sections/Features";
-import { ServicesIntro } from "@/components/sections/ServicesIntro";
-import { Fleet } from "@/components/sections/Fleet";
-import { MapSection } from "@/components/sections/Map";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { QuoteWizard } from "@/components/form/QuoteWizard";
-import { FAQ } from "@/components/sections/FAQ";
+
+const ServicesIntro = dynamic(() => import("@/components/sections/ServicesIntro").then(m => ({ default: m.ServicesIntro })));
+const Fleet         = dynamic(() => import("@/components/sections/Fleet").then(m => ({ default: m.Fleet })));
+const MapSection    = dynamic(() => import("@/components/sections/Map").then(m => ({ default: m.MapSection })));
+const Testimonials  = dynamic(() => import("@/components/sections/Testimonials").then(m => ({ default: m.Testimonials })));
+const QuoteWizard   = dynamic(() => import("@/components/form/QuoteWizard").then(m => ({ default: m.QuoteWizard })));
+const FAQ           = dynamic(() => import("@/components/sections/FAQ").then(m => ({ default: m.FAQ })));
 
 export const metadata: Metadata = {
   title: "Destinos Express — Transporte Especial y Ejecutivo en Colombia",

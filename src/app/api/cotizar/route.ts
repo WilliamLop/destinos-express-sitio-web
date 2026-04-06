@@ -9,9 +9,31 @@ export async function POST(req: NextRequest) {
     const {
         nombre, empresa, email, telefono,
         origen, destino, fecha, hora,
+        fecha_vuelta, hora_vuelta, duracion,
         pax, maletas, tipo_vehiculo, tipo_trayecto,
         observaciones, servicio,
     } = data;
+
+    const isRoundTrip   = tipo_trayecto === "Ida y Vuelta";
+    const isDisposicion = tipo_trayecto === "A disposición";
+
+    const destinoDisplay = isDisposicion ? "A disposición" : (destino || "—");
+    const emailSubject   = isDisposicion
+        ? `Nueva cotización — ${nombre} | ${origen} · A disposición (${duracion})`
+        : `Nueva cotización — ${nombre} | ${origen} → ${destinoDisplay}`;
+
+    const rutaExtraRows = isRoundTrip ? `
+        <div class="field"><label>Fecha de Vuelta</label><span>${fecha_vuelta || "—"}</span></div>
+        <div class="field"><label>Hora de Vuelta</label><span>${hora_vuelta || "Por definir"}</span></div>
+    ` : isDisposicion ? `
+        <div class="field"><label>Duración</label><span>${duracion || "—"}</span></div>
+    ` : "";
+
+    const botMsgExtra = isRoundTrip
+        ? `\nFecha vuelta: ${fecha_vuelta || "—"}\nHora vuelta: ${hora_vuelta || "Por definir"}`
+        : isDisposicion
+        ? `\nDuración: ${duracion || "—"}`
+        : "";
 
     const html = `
 <!DOCTYPE html>
@@ -51,10 +73,11 @@ export async function POST(req: NextRequest) {
       <div class="section-title">Datos de la Ruta</div>
       <div class="grid">
         <div class="field"><label>Origen</label><span>${origen}</span></div>
-        <div class="field"><label>Destino</label><span>${destino}</span></div>
-        <div class="field"><label>Fecha</label><span>${fecha}</span></div>
-        <div class="field"><label>Hora</label><span>${hora || "Por definir"}</span></div>
+        <div class="field"><label>Destino</label><span>${destinoDisplay}</span></div>
         <div class="field"><label>Trayecto</label><span>${tipo_trayecto}</span></div>
+        <div class="field"><label>Fecha${isRoundTrip ? " de Ida" : isDisposicion ? " de Inicio" : ""}</label><span>${fecha}</span></div>
+        <div class="field"><label>Hora${isRoundTrip ? " de Ida" : isDisposicion ? " de Inicio" : ""}</label><span>${hora || "Por definir"}</span></div>
+        ${rutaExtraRows}
         <div class="field"><label>Pasajeros</label><span>${pax}</span></div>
         <div class="field"><label>Equipaje</label><span>${maletas ?? 0} piezas</span></div>
         <div class="field"><label>Vehículo Sugerido</label><span>${tipo_vehiculo}</span></div>
@@ -77,13 +100,13 @@ export async function POST(req: NextRequest) {
         <p class="bot-title">Mensaje para Bot-Destinos</p>
         <p class="bot-subtitle">Copia este texto y pégalo en Telegram para cotizar en 15 segundos</p>
         <div class="bot-msg">Origen: ${origen}
-Destino: ${destino}
+Destino: ${destinoDisplay}
+Trayecto: ${tipo_trayecto}
 Fecha: ${fecha}
-Hora: ${hora || "Por definir"}
+Hora: ${hora || "Por definir"}${botMsgExtra}
 Pasajeros: ${pax}
 Equipaje: ${maletas ?? 0} piezas
-Vehículo: ${tipo_vehiculo}
-Trayecto: ${tipo_trayecto}${observaciones ? `\nObservaciones: ${observaciones}` : ""}</div>
+Vehículo: ${tipo_vehiculo}${observaciones ? `\nObservaciones: ${observaciones}` : ""}</div>
       </div>
     </div>
     <div class="footer">Este correo fue generado automáticamente desde el formulario web de destinosexpress.com</div>
@@ -95,7 +118,7 @@ Trayecto: ${tipo_trayecto}${observaciones ? `\nObservaciones: ${observaciones}` 
         from: "Destinos Express Web <noreply@destinosexpress.com>",
         to: ["ventas@destinosexpress.com"],
         replyTo: email,
-        subject: `Nueva cotización — ${nombre} | ${origen} → ${destino}`,
+        subject: emailSubject,
         html,
     });
 

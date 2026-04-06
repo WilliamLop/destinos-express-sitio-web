@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Users, Settings2, Briefcase, ShieldCheck, Wifi, ChevronRight, ArrowRight } from "lucide-react";
-import { VehicleCard, type Vehicle } from "@/components/fleet/VehicleCard";
+import dynamic from "next/dynamic";
+import type { Vehicle } from "@/components/fleet/VehicleCard";
+
+const VehicleCard = dynamic(() => import("@/components/fleet/VehicleCard").then(m => ({ default: m.VehicleCard })));
+const QuoteWizard = dynamic(() => import("@/components/form/QuoteWizard").then(m => ({ default: m.QuoteWizard })));
 
 const vehicles: Vehicle[] = [
     {
@@ -359,8 +363,7 @@ export default function FlotaPage() {
 
                             <motion.a
                                 custom={0.35} variants={fadeUp} initial="hidden" animate="show"
-                                href="https://wa.me/573024060101?text=Hola%2C%20quiero%20cotizar%20un%20servicio%20de%20transporte"
-                                target="_blank" rel="noopener noreferrer"
+                                href="#cotizar"
                                 className="group inline-flex items-center gap-2.5 bg-[#FCA311] hover:bg-[#e8940a] text-[#0D0D0D] font-bold text-sm px-6 py-3 rounded-xl transition-all duration-200 shadow-lg shadow-[#FCA311]/20 hover:shadow-[#FCA311]/35 hover:scale-[1.02]"
                             >
                                 Cotizar vehículo
@@ -434,6 +437,7 @@ export default function FlotaPage() {
                     ))}
                 </div>
             </div>
+            <QuoteWizard />
         </main>
     );
 }

@@ -17,6 +17,7 @@ import {
     Navigation,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const services = [
     {
@@ -130,6 +131,16 @@ const services = [
 ];
 
 export function Services() {
+    const pathname = usePathname();
+
+    const handleServiceClick = (e: React.MouseEvent<HTMLAnchorElement>, serviceTitle: string) => {
+        if (pathname === "/servicios") {
+            e.preventDefault();
+            window.history.pushState(null, "", `/servicios?servicio=${encodeURIComponent(serviceTitle)}#cotizar`);
+            document.getElementById("cotizar-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    };
+
     return (
         <section id="servicios" className="py-24 bg-white">
             <div className="container mx-auto px-4 md:px-6">
@@ -275,7 +286,8 @@ export function Services() {
 
                                 {/* CTA */}
                                 <a
-                                    href={`/?servicio=${encodeURIComponent(service.title)}#cotizar`}
+                                    href={`/servicios?servicio=${encodeURIComponent(service.title)}#cotizar`}
+                                    onClick={(e) => handleServiceClick(e, service.title)}
                                     className={`inline-flex items-center gap-2 font-bold text-sm group/cta transition-all ${
                                         service.dark
                                             ? "text-accent hover:text-white"
@@ -308,7 +320,7 @@ export function Services() {
                         </p>
                     </div>
                     <a
-                        href="/#cotizar"
+                        href="#cotizar"
                         className="shrink-0 bg-accent hover:bg-accent-hover text-primary font-bold px-7 py-3.5 rounded-full transition-all shadow-lg hover:shadow-accent/30 flex items-center gap-2"
                     >
                         Solicitar Cotización

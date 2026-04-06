@@ -9,6 +9,9 @@ export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
+    const quoteHref = pathname === "/" || pathname === "/servicios" || pathname === "/flota"
+        ? "#cotizar"
+        : "/#cotizar";
 
     const navLinks = [
         { href: "/", label: "Inicio" },
@@ -72,7 +75,7 @@ export function Navbar() {
                         +57 302 406 0101
                     </a>
                     <Link
-                        href="/#cotizar"
+                        href={quoteHref}
                         className="bg-accent hover:bg-accent-hover text-white px-5 py-2.5 rounded-full font-semibold transition-all shadow-md hover:shadow-lg text-sm"
                     >
                         Cotizar Servicio
@@ -105,7 +108,7 @@ export function Navbar() {
                     ))}
                     <div className="h-px w-full bg-gray-100 my-2" />
                     <Link
-                        href="/#cotizar"
+                        href={quoteHref}
                         className="bg-accent text-white text-center py-3 rounded-xl font-semibold w-full"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >

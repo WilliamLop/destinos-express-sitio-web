@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Settings2, Briefcase, ShieldCheck, Wifi, Calendar, X } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 
 export interface VehicleFeature {
     icon: React.ReactNode;
@@ -27,8 +26,20 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle, index }: VehicleCardProps) {
+    const router = useRouter();
+    const pathname = usePathname();
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleReserve = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (pathname === "/flota") {
+            e.preventDefault();
+            router.push(`/flota?vehiculo=${encodeURIComponent(vehicle.name)}#cotizar`, { scroll: false });
+            setTimeout(() => {
+                document.getElementById("cotizar-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 50);
+        }
+    };
 
     const maxThumbnails = 4;
     const thumbnails = vehicle.images.slice(0, maxThumbnails);
@@ -139,13 +150,14 @@ export function VehicleCard({ vehicle, index }: VehicleCardProps) {
                             ))}
                         </div>
 
-                        <Link
-                            href={`/#cotizar?service=Transporte Especial&vehicle=${encodeURIComponent(vehicle.name)}`}
+                        <a
+                            href={`/flota?vehiculo=${encodeURIComponent(vehicle.name)}#cotizar`}
+                            onClick={handleReserve}
                             className="w-full sm:w-auto inline-flex items-center justify-center bg-accent hover:bg-accent-hover text-primary font-bold py-4 px-8 rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                         >
                             <Calendar className="w-5 h-5 mr-2" />
                             Reservar este vehículo
-                        </Link>
+                        </a>
                     </motion.div>
                 </div>
             </div>

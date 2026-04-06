@@ -1,60 +1,106 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Send, MapPin, Calendar, Clock, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Zap, Headphones, Star } from "lucide-react";
+import { Send, MapPin, Calendar, Clock, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Zap, Headphones, Star, Timer } from "lucide-react";
 
-// Zod Schema
+const vehicleOptions = ["Kia Soluto", "Renault Duster", "Mini Van", "Van Trafic", "Van Sprinter", "Bus"] as const;
+const DURACION_OPTIONS = ["2 horas", "3 horas", "4 horas", "6 horas", "8 horas", "10 horas", "12 horas", "Todo el día"];
+
 const formSchema = z.object({
     origen: z.string().min(3, "Origen requerido"),
-    destino: z.string().min(3, "Destino requerido"),
+    destino: z.string().optional(),
     tipo_trayecto: z.enum(["Sencillo", "Ida y Vuelta", "A disposición"]),
     fecha: z.string().min(1, "Seleccione fecha"),
     hora: z.string().optional(),
+    fecha_vuelta: z.string().optional(),
+    hora_vuelta: z.string().optional(),
+    duracion: z.string().optional(),
 
     pax: z.coerce.number().min(1, "Mínimo 1 pasajero"),
     maletas: z.coerce.number().min(0).optional(),
-    tipo_vehiculo: z.enum(["Kia Soluto", "Renault Duster", "Mini Van", "Van Trafic", "Van Sprinter", "Bus"]),
+    tipo_vehiculo: z.enum(vehicleOptions),
     observaciones: z.string().optional(),
 
     nombre: z.string().min(2, "Nombre requerido"),
     empresa: z.string().optional(),
     email: z.string().email("Correo inválido"),
     telefono: z.string().min(10, "Teléfono inválido"),
+}).superRefine((data, ctx) => {
+    if (data.tipo_trayecto !== "A disposición" && (!data.destino || data.destino.length < 3)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Destino requerido", path: ["destino"] });
+    }
+    if (data.tipo_trayecto === "Ida y Vuelta" && !data.fecha_vuelta) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Seleccione fecha de vuelta", path: ["fecha_vuelta"] });
+    }
+    if (data.tipo_trayecto === "A disposición" && (!data.duracion || data.duracion === "")) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Indique la duración estimada", path: ["duracion"] });
+    }
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-function QuoteWizardForm() {
+interface QuoteWizardProps {
+    id?: string;
+    initialService?: string;
+    initialVehicle?: FormData["tipo_vehiculo"];
+}
+
+function QuoteWizardForm({ initialService, initialVehicle }: Pick<QuoteWizardProps, "initialService" | "initialVehicle">) {
     const searchParams = useSearchParams();
-    const selectedService = searchParams?.get("servicio");
+    const selectedService = searchParams?.get("servicio") ?? searchParams?.get("service") ?? initialService;
+    const requestedVehicle = searchParams?.get("vehiculo") ?? searchParams?.get("vehicle") ?? initialVehicle;
+    const selectedVehicle = vehicleOptions.find((vehicle) => vehicle === requestedVehicle);
 
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const { register, handleSubmit, formState: { errors }, trigger, watch, reset } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, trigger, watch, reset, setValue } = useForm<FormData>({
         resolver: zodResolver(formSchema) as any,
         defaultValues: {
             tipo_trayecto: "Sencillo",
-            tipo_vehiculo: "Mini Van",
+            tipo_vehiculo: selectedVehicle ?? initialVehicle ?? "Mini Van",
             pax: 1,
             maletas: 0,
         }
     });
 
     const formData = watch();
+    const tipoTrayecto = formData.tipo_trayecto;
+
+    useEffect(() => {
+        if (selectedVehicle) {
+            setValue("tipo_vehiculo", selectedVehicle, { shouldDirty: false, shouldTouch: false, shouldValidate: false });
+        }
+    }, [selectedVehicle, setValue]);
+
+    // Clear conditional fields when trip type changes
+    useEffect(() => {
+        if (tipoTrayecto !== "Ida y Vuelta") {
+            setValue("fecha_vuelta", "");
+            setValue("hora_vuelta", "");
+        }
+        if (tipoTrayecto !== "A disposición") {
+            setValue("duracion", "");
+        }
+    }, [tipoTrayecto, setValue]);
 
     const nextStep = async () => {
-        let fieldsToValidate: any[] = [];
-        if (step === 1) fieldsToValidate = ["origen", "destino", "fecha", "hora", "tipo_trayecto"];
+        let fieldsToValidate: string[] = [];
+        if (step === 1) {
+            fieldsToValidate = ["origen", "fecha", "tipo_trayecto"];
+            if (tipoTrayecto !== "A disposición") fieldsToValidate.push("destino");
+            if (tipoTrayecto === "Ida y Vuelta") fieldsToValidate.push("fecha_vuelta");
+            if (tipoTrayecto === "A disposición") fieldsToValidate.push("duracion");
+        }
         if (step === 2) fieldsToValidate = ["pax", "maletas", "tipo_vehiculo"];
 
-        const isStepValid = await trigger(fieldsToValidate);
+        const isStepValid = await trigger(fieldsToValidate as any);
         if (isStepValid) setStep((prev) => prev + 1);
     };
 
@@ -62,7 +108,15 @@ function QuoteWizardForm() {
 
     const formatWhatsAppMsg = (data: FormData) => {
         const servInfo = selectedService ? `\n*Servicio de interés:* ${selectedService}` : "";
-        return `Hola, deseo cotizar un servicio de transporte:${servInfo}\n\n*Ruta:* ${data.origen} -> ${data.destino}\n*Fecha:* ${data.fecha} a las ${data.hora || 'Por definir'}\n*Pasajeros:* ${data.pax} | *Vehículo:* ${data.tipo_vehiculo}\n*A nombre de:* ${data.nombre}\n\nQuedo atento.`;
+        const destInfo = data.tipo_trayecto === "A disposición" ? "A disposición" : data.destino;
+        let fechaInfo = `${data.fecha} a las ${data.hora || "Por definir"}`;
+        if (data.tipo_trayecto === "Ida y Vuelta") {
+            fechaInfo += `\n*Fecha de vuelta:* ${data.fecha_vuelta} a las ${data.hora_vuelta || "Por definir"}`;
+        }
+        if (data.tipo_trayecto === "A disposición") {
+            fechaInfo += `\n*Duración:* ${data.duracion}`;
+        }
+        return `Hola, deseo cotizar un servicio de transporte:${servInfo}\n\n*Ruta:* ${data.origen} → ${destInfo}\n*Trayecto:* ${data.tipo_trayecto}\n*Fecha:* ${fechaInfo}\n*Pasajeros:* ${data.pax} | *Vehículo:* ${data.tipo_vehiculo}\n*A nombre de:* ${data.nombre}\n\nQuedo atento.`;
     };
 
     const onSubmit = async (data: FormData) => {
@@ -81,9 +135,7 @@ function QuoteWizardForm() {
         }
     };
 
-    // WhatsApp direct option (no DB save)
     const buyViaWhatsApp = async () => {
-        // validate all steps
         const isValid = await trigger();
         if (isValid) {
             window.open(`https://wa.me/573024060101?text=${encodeURIComponent(formatWhatsAppMsg(formData))}`, "_blank");
@@ -97,10 +149,16 @@ function QuoteWizardForm() {
         { icon: <Star size={16} />, text: "99% de satisfacción de clientes" },
     ];
 
+    const fechaLabel = tipoTrayecto === "Ida y Vuelta" ? "Fecha de Ida *" : tipoTrayecto === "A disposición" ? "Fecha de Inicio *" : "Fecha *";
+    const horaLabel  = tipoTrayecto === "Ida y Vuelta" ? "Hora de Ida"    : tipoTrayecto === "A disposición" ? "Hora de Inicio"   : "Hora Estimada";
+
+    const inputCls = "w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all";
+    const inputNoPrefixCls = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all";
+
     return (
         <section className="relative bg-primary py-24 overflow-hidden">
 
-            {/* ── Background photo layer ── */}
+            {/* Background photo layer */}
             <div className="absolute inset-0 z-0">
                 <img
                     src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2670&auto=format&fit=crop"
@@ -111,25 +169,22 @@ function QuoteWizardForm() {
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/85 to-primary" />
             </div>
 
-            {/* ── Gold dot grid ── */}
+            {/* Gold dot grid */}
             <div
                 className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none"
-                style={{
-                    backgroundImage: "radial-gradient(#FCA311 1px, transparent 1px)",
-                    backgroundSize: "30px 30px",
-                }}
+                style={{ backgroundImage: "radial-gradient(#FCA311 1px, transparent 1px)", backgroundSize: "30px 30px" }}
             />
 
-            {/* ── Ambient glow accents ── */}
+            {/* Ambient glow accents */}
             <div className="absolute -top-32 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] pointer-events-none z-0" />
             <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-accent/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
-            {/* ── Diagonal accent line ── */}
+            {/* Diagonal accent line */}
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent z-0" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
 
-                {/* ── Dramatic header ── */}
+                {/* Dramatic header */}
                 <motion.div
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -149,7 +204,7 @@ function QuoteWizardForm() {
                     </p>
                 </motion.div>
 
-                {/* ── Trust signals row ── */}
+                {/* Trust signals row */}
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -168,16 +223,17 @@ function QuoteWizardForm() {
                     ))}
                 </motion.div>
 
-                {/* ── Form card — identical internals, elevated shadow ── */}
+                {/* Form card */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.15 }}
+                    id="cotizar-card"
                     className="max-w-4xl mx-auto bg-white rounded-3xl shadow-[0_32px_80px_rgba(0,0,0,0.45)] overflow-hidden ring-1 ring-white/10 p-1"
                 >
-
                     <div className="grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
+
                         {/* Sidebar / Progress */}
                         <div className="md:col-span-4 bg-primary text-white p-8 rounded-2xl flex flex-col justify-between relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-accent rounded-full blur-3xl opacity-20 -mr-10 -mt-10" />
@@ -194,7 +250,6 @@ function QuoteWizardForm() {
                                 )}
 
                                 <div className="space-y-8 relative">
-                                    {/* Progress Line */}
                                     <div className="absolute left-4 top-4 w-0.5 h-32 bg-white/10" />
 
                                     <div className="flex items-center gap-4 relative z-10">
@@ -216,9 +271,7 @@ function QuoteWizardForm() {
 
                             <div className="mt-12">
                                 <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
-                                    <p className="text-xs text-gray-300">
-                                        ¿Asistencia Inmediata?
-                                    </p>
+                                    <p className="text-xs text-gray-300">¿Asistencia Inmediata?</p>
                                     <a href="https://wa.me/573024060101" target="_blank" rel="noopener noreferrer" className="font-bold text-accent text-sm mt-1 block hover:underline">
                                         Chatear con Operaciones
                                     </a>
@@ -242,11 +295,7 @@ function QuoteWizardForm() {
                                         Hemos registrado tu solicitud correctamente. En breve te redirigiremos a WhatsApp para seguimiento inmediato, o uno de nuestros asesores te contactará al correo proporcionado.
                                     </p>
                                     <button
-                                        onClick={() => {
-                                            setIsSuccess(false);
-                                            setStep(1);
-                                            reset();
-                                        }}
+                                        onClick={() => { setIsSuccess(false); setStep(1); reset(); }}
                                         className="text-accent font-semibold hover:underline"
                                     >
                                         Realizar nueva cotización
@@ -258,71 +307,167 @@ function QuoteWizardForm() {
                                     <div className="flex-1">
                                         <AnimatePresence mode="wait">
 
-                                            {/* STEP 1 */}
+                                            {/* ── STEP 1 ── */}
                                             {step === 1 && (
                                                 <motion.div
                                                     key="step1"
                                                     initial={{ opacity: 0, x: 20 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     exit={{ opacity: 0, x: -20 }}
-                                                    className="space-y-6"
                                                 >
                                                     <h4 className="text-xl font-bold text-primary font-heading mb-6 border-b pb-2">Datos de la Ruta</h4>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div className="space-y-6">
+
+                                                        {/* 1. Tipo de Trayecto — first so the form adapts immediately */}
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Punto de Origen *</label>
-                                                            <div className="relative">
-                                                                <MapPin size={18} className="absolute left-3 top-3.5 text-gray-400" />
-                                                                <input {...register("origen")} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all" placeholder="Ej. Aeropuerto El Dorado" />
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Trayecto</label>
+                                                            <div className="flex flex-wrap gap-3">
+                                                                {(["Sencillo", "Ida y Vuelta", "A disposición"] as const).map((type) => {
+                                                                    const isSelected = tipoTrayecto === type;
+                                                                    return (
+                                                                        <label
+                                                                            key={type}
+                                                                            className={`relative flex items-center gap-3 px-4 py-3 border-2 rounded-xl cursor-pointer transition-all select-none ${
+                                                                                isSelected
+                                                                                    ? "border-accent bg-accent/5 text-primary"
+                                                                                    : "border-gray-200 hover:border-gray-300 text-gray-600"
+                                                                            }`}
+                                                                        >
+                                                                            <input type="radio" value={type} {...register("tipo_trayecto")} className="sr-only" />
+                                                                            <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${isSelected ? "border-accent" : "border-gray-300"}`}>
+                                                                                {isSelected && <span className="w-2 h-2 rounded-full bg-accent" />}
+                                                                            </span>
+                                                                            <span className="text-sm font-semibold whitespace-nowrap">{type}</span>
+                                                                        </label>
+                                                                    );
+                                                                })}
                                                             </div>
-                                                            {errors.origen && <p className="text-red-500 text-xs mt-1">{errors.origen.message as string}</p>}
                                                         </div>
 
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Destino Final *</label>
-                                                            <div className="relative">
-                                                                <MapPin size={18} className="absolute left-3 top-3.5 text-gray-400" />
-                                                                <input {...register("destino")} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all" placeholder="Ej. Hotel Tequendama" />
+                                                        {/* 2. Origen + Destino (Destino hidden for "A disposición") */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">Punto de Origen *</label>
+                                                                <div className="relative">
+                                                                    <MapPin size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                    <input {...register("origen")} className={inputCls} placeholder="Ej. Aeropuerto El Dorado" />
+                                                                </div>
+                                                                {errors.origen && <p className="text-red-500 text-xs mt-1">{errors.origen.message as string}</p>}
                                                             </div>
-                                                            {errors.destino && <p className="text-red-500 text-xs mt-1">{errors.destino.message as string}</p>}
+
+                                                            <AnimatePresence>
+                                                                {tipoTrayecto !== "A disposición" && (
+                                                                    <motion.div
+                                                                        key="destino-field"
+                                                                        initial={{ opacity: 0, x: 8 }}
+                                                                        animate={{ opacity: 1, x: 0 }}
+                                                                        exit={{ opacity: 0, x: 8 }}
+                                                                        transition={{ duration: 0.2 }}
+                                                                    >
+                                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Destino Final *</label>
+                                                                        <div className="relative">
+                                                                            <MapPin size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                            <input {...register("destino")} className={inputCls} placeholder="Ej. Hotel Tequendama" />
+                                                                        </div>
+                                                                        {errors.destino && <p className="text-red-500 text-xs mt-1">{errors.destino.message as string}</p>}
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
                                                         </div>
+
+                                                        {/* 3. Fecha + Hora (labels update by trip type) */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">{fechaLabel}</label>
+                                                                <div className="relative">
+                                                                    <Calendar size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                    <input type="date" {...register("fecha")} className={inputCls} />
+                                                                </div>
+                                                                {errors.fecha && <p className="text-red-500 text-xs mt-1">{errors.fecha.message as string}</p>}
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-1">{horaLabel}</label>
+                                                                <div className="relative">
+                                                                    <Clock size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                    <input type="time" {...register("hora")} className={inputCls} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
-                                                            <div className="relative">
-                                                                <Calendar size={18} className="absolute left-3 top-3.5 text-gray-400" />
-                                                                <input type="date" {...register("fecha")} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none" />
-                                                            </div>
-                                                            {errors.fecha && <p className="text-red-500 text-xs mt-1">{errors.fecha.message as string}</p>}
-                                                        </div>
+                                                    {/* 4. Conditional: Ida y Vuelta → fecha y hora de vuelta */}
+                                                    <AnimatePresence>
+                                                        {tipoTrayecto === "Ida y Vuelta" && (
+                                                            <motion.div
+                                                                key="vuelta-fields"
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: "auto", opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                style={{ overflow: "hidden" }}
+                                                            >
+                                                                <div className="mt-6 pt-5 border-t border-dashed border-accent/30">
+                                                                    <p className="text-xs font-bold text-accent uppercase tracking-widest mb-4">Datos del regreso</p>
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                        <div>
+                                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Vuelta *</label>
+                                                                            <div className="relative">
+                                                                                <Calendar size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                                <input type="date" {...register("fecha_vuelta")} className={inputCls} />
+                                                                            </div>
+                                                                            {errors.fecha_vuelta && <p className="text-red-500 text-xs mt-1">{errors.fecha_vuelta.message as string}</p>}
+                                                                        </div>
+                                                                        <div>
+                                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Hora de Vuelta</label>
+                                                                            <div className="relative">
+                                                                                <Clock size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                                <input type="time" {...register("hora_vuelta")} className={inputCls} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
 
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">Hora Estimada</label>
-                                                            <div className="relative">
-                                                                <Clock size={18} className="absolute left-3 top-3.5 text-gray-400" />
-                                                                <input type="time" {...register("hora")} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    {/* 5. Conditional: A disposición → duración estimada */}
+                                                    <AnimatePresence>
+                                                        {tipoTrayecto === "A disposición" && (
+                                                            <motion.div
+                                                                key="duracion-field"
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: "auto", opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                style={{ overflow: "hidden" }}
+                                                            >
+                                                                <div className="mt-6 pt-5 border-t border-dashed border-accent/30">
+                                                                    <p className="text-xs font-bold text-accent uppercase tracking-widest mb-4">Tiempo de disposición</p>
+                                                                    <div>
+                                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Duración Estimada *</label>
+                                                                        <div className="relative">
+                                                                            <Timer size={18} className="absolute left-3 top-3.5 text-gray-400" />
+                                                                            <select {...register("duracion")} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none appearance-none transition-all">
+                                                                                <option value="">Seleccionar duración...</option>
+                                                                                {DURACION_OPTIONS.map((d) => (
+                                                                                    <option key={d} value={d}>{d}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </div>
+                                                                        {errors.duracion && <p className="text-red-500 text-xs mt-1">{errors.duracion.message as string}</p>}
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
 
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Trayecto</label>
-                                                        <div className="flex flex-wrap gap-4">
-                                                            {["Sencillo", "Ida y Vuelta", "A disposición"].map((type) => (
-                                                                <label key={type} className="relative flex items-center p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
-                                                                    <input type="radio" value={type} {...register("tipo_trayecto")} className="w-4 h-4 text-accent border-gray-300 focus:ring-accent" />
-                                                                    <span className="ml-3 text-sm font-medium text-gray-700">{type}</span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
                                                 </motion.div>
                                             )}
 
-                                            {/* STEP 2 */}
+                                            {/* ── STEP 2 ── */}
                                             {step === 2 && (
                                                 <motion.div
                                                     key="step2"
@@ -336,12 +481,12 @@ function QuoteWizardForm() {
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-700 mb-1">Número de Pasajeros *</label>
-                                                            <input type="number" min="1" {...register("pax")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" />
+                                                            <input type="number" min="1" {...register("pax")} className={inputNoPrefixCls} />
                                                             {errors.pax && <p className="text-red-500 text-xs mt-1">{errors.pax.message as string}</p>}
                                                         </div>
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-700 mb-1">Piezas de Equipaje</label>
-                                                            <input type="number" min="0" {...register("maletas")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" />
+                                                            <input type="number" min="0" {...register("maletas")} className={inputNoPrefixCls} />
                                                         </div>
                                                     </div>
 
@@ -364,7 +509,7 @@ function QuoteWizardForm() {
                                                 </motion.div>
                                             )}
 
-                                            {/* STEP 3 */}
+                                            {/* ── STEP 3 ── */}
                                             {step === 3 && (
                                                 <motion.div
                                                     key="step3"
@@ -378,24 +523,24 @@ function QuoteWizardForm() {
                                                     <div className="grid grid-cols-1 gap-6">
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
-                                                            <input {...register("nombre")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" placeholder="Juan Pérez" />
+                                                            <input {...register("nombre")} className={inputNoPrefixCls} placeholder="Juan Pérez" />
                                                             {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre.message as string}</p>}
                                                         </div>
 
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-700 mb-1">Empresa (Opcional)</label>
-                                                            <input {...register("empresa")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" placeholder="Mi Empresa S.A.S." />
+                                                            <input {...register("empresa")} className={inputNoPrefixCls} placeholder="Mi Empresa S.A.S." />
                                                         </div>
 
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                             <div>
                                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
-                                                                <input type="email" {...register("email")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" placeholder="juan@correo.com" />
+                                                                <input type="email" {...register("email")} className={inputNoPrefixCls} placeholder="juan@correo.com" />
                                                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message as string}</p>}
                                                             </div>
                                                             <div>
                                                                 <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono / WhatsApp *</label>
-                                                                <input type="tel" {...register("telefono")} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent" placeholder="+57 300 000 0000" />
+                                                                <input type="tel" {...register("telefono")} className={inputNoPrefixCls} placeholder="+57 300 000 0000" />
                                                                 {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono.message as string}</p>}
                                                             </div>
                                                         </div>
@@ -413,7 +558,7 @@ function QuoteWizardForm() {
                                                 <ArrowLeft size={18} /> Atrás
                                             </button>
                                         ) : (
-                                            <div /> // empty flex placeholder
+                                            <div />
                                         )}
 
                                         {step < 3 ? (
@@ -451,15 +596,15 @@ function QuoteWizardForm() {
     );
 }
 
-export function QuoteWizard() {
+export function QuoteWizard({ id = "cotizar", initialService, initialVehicle }: QuoteWizardProps) {
     return (
-        <div id="cotizar" className="scroll-mt-20">
+        <div id={id} className="scroll-mt-20">
             <Suspense fallback={
                 <div className="py-24 bg-primary flex justify-center min-h-[600px] items-center">
                     <p className="text-white/50 font-medium">Cargando cotizador...</p>
                 </div>
             }>
-                <QuoteWizardForm />
+                <QuoteWizardForm initialService={initialService} initialVehicle={initialVehicle} />
             </Suspense>
         </div>
     );
