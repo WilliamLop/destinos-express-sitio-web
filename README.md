@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Destinos Express — Sitio Web Corporativo
 
-## Getting Started
+Sitio web oficial de **Destinos Express**, empresa de transporte especial y ejecutivo en Colombia. Desarrollado con Next.js 16, ofrece información de servicios, catálogo de flota y un formulario de cotización integrado.
 
-First, run the development server:
+## Tecnologías
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** — App Router, SSR, optimización de imágenes
+- **TypeScript** — tipado estático en todo el proyecto
+- **Tailwind CSS** — estilos utilitarios
+- **Framer Motion** — animaciones y transiciones
+- **React Hook Form + Zod** — formulario de cotización con validación
+- **Resend** — envío de correos transaccionales desde `/api/cotizar`
+- **Lucide React** — iconografía
+
+## Páginas
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Home: hero, servicios, flota destacada, mapa, testimonios, cotizador, FAQ |
+| `/servicios` | Detalle de todos los servicios ofrecidos + cotizador |
+| `/flota` | Catálogo completo de vehículos con galería + cotizador |
+| `/nosotros` | Historia y valores de la empresa |
+
+## Funcionalidad destacada
+
+### Cotizador (`QuoteWizard`)
+Formulario de 3 pasos que soporta los 3 tipos de trayecto:
+- **Sencillo** — origen, destino, fecha y hora
+- **Ida y Vuelta** — agrega campos de fecha y hora de vuelta
+- **A disposición** — reemplaza destino por duración estimada
+
+Al enviar, dispara dos acciones en paralelo:
+1. Correo HTML a `ventas@destinosexpress.com` vía Resend
+2. Mensaje pre-formateado para WhatsApp (bot de cotización en Telegram)
+
+### Preselección por URL
+Desde cualquier página, un botón puede llevar al cotizador con un vehículo o servicio preseleccionado:
+```
+/flota?vehiculo=Van Sprinter#cotizar
+/?servicio=Transporte Ejecutivo#cotizar
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Desarrollo local
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Abre [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+### Variables de entorno requeridas
 
-To learn more about Next.js, take a look at the following resources:
+Crea un archivo `.env.local` con:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+RESEND_API_KEY=re_xxxxxxxxxxxx
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura del proyecto
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── api/cotizar/       # Endpoint de cotización (email + validación)
+│   ├── flota/             # Página de flota
+│   ├── servicios/         # Página de servicios
+│   ├── nosotros/          # Página institucional
+│   └── page.tsx           # Home
+├── components/
+│   ├── form/              # QuoteWizard
+│   ├── fleet/             # VehicleCard
+│   ├── layout/            # Navbar, Footer
+│   ├── sections/          # Hero, Services, Fleet, Map, Testimonials, FAQ
+│   └── ui/                # Componentes reutilizables
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El proyecto se despliega en **Vercel**. Cada push a `main` activa un deploy automático.
+
+```bash
+npm run build   # Verificar build antes de push
+```
