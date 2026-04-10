@@ -39,11 +39,8 @@ export function Navbar() {
                 }`}
         >
             <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <span className={`text-2xl font-bold tracking-tight font-heading text-primary`}>
-                        DESTINOS<span className="text-accent">EXPRESS</span>
-                    </span>
+                <Link href="/" className="flex items-center">
+                    <img src="/icons/logohero.svg" alt="Destinos Express" className="h-10 w-auto" />
                 </Link>
 
                 {/* Desktop Nav */}
