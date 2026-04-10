@@ -19,6 +19,11 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://destinosexpress.com"),
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   title: {
     template: "%s | Destinos Express",
     default: "Destinos Express — Transporte Especial y Ejecutivo en Colombia",
