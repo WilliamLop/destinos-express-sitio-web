@@ -20,9 +20,12 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL("https://destinosexpress.com"),
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: { url: "/icon.png", type: "image/png", sizes: "192x192" },
   },
   title: {
     template: "%s | Destinos Express",
