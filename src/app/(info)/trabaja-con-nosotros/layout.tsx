@@ -45,6 +45,11 @@ const jsonLd = {
                     addressCountry: "CO",
                 },
             },
+            datePosted: "2026-01-01",
+            applicantLocationRequirements: {
+                "@type": "Country",
+                name: "CO",
+            },
             employmentType: "CONTRACTOR",
             jobLocationType: "TELECOMMUTE",
         },
